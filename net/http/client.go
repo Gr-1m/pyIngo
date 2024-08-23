@@ -42,6 +42,10 @@ func (c *Client) Get(endpoint string, headers map[string]string) (resp *http.Res
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: !c.tlsverify},
 			Proxy:           func(r *http.Request) (*url.URL, error) { return url.Parse(c.proxy) },
 		}
+	}else{
+		c.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: !c.tlsverify},
+		}
 	}
 	return c.Do(req)
 
@@ -74,6 +78,9 @@ func (c *Client) Post(endpoint string, headers map[string]string, body io.Reader
 		}
 		c.Timeout = time.Second * 5
 	} else {
+		c.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: !c.tlsverify},
+		}
 		c.Timeout = time.Second * 3
 	}
 
