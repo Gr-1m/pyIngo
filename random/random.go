@@ -8,8 +8,16 @@ import (
 
 var seed *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-func RandomInt(maxNum int) int {
-	return seed.Intn(maxNum)
+func RandomInt(minNum, maxNum int) (s int) {
+	if minNum == 0 {
+		return seed.Intn(maxNum)
+	}
+
+	for s = 0; s <= minNum; {
+		s = seed.Intn(maxNum)
+	}
+	return s
+
 }
 
 func GetRandBit(bitNum int) int {
@@ -25,10 +33,10 @@ func RandomChoice(population interface{}) (interface{}, error) {
 	switch vt := population.(type) {
 	case string:
 		ln = len(vt)
-		return string(vt[RandomInt(ln)]), nil
+		return string(vt[RandomInt(0, ln)]), nil
 	case []interface{}:
 		ln = len(vt)
-		return vt[RandomInt(ln)], nil
+		return vt[RandomInt(0, ln)], nil
 	default:
 		return nil, errors.New("Unsupported Type")
 	}
@@ -43,12 +51,12 @@ func RandomChoices(population interface{}, repeat int) ([]interface{}, error) {
 	case string:
 		ln = len(vt)
 		for i := range buf {
-			buf[i] = string(vt[RandomInt(ln)])
+			buf[i] = string(vt[RandomInt(0, ln)])
 		}
 	case []interface{}:
 		ln = len(vt)
 		for i := range buf {
-			buf[i] = vt[RandomInt(ln)]
+			buf[i] = vt[RandomInt(0, ln)]
 		}
 	default:
 		return nil, errors.New("Unsupported Type")
@@ -70,7 +78,7 @@ func GenRandomString(length int, charset string) string {
 	)
 
 	for i := range buf {
-		buf[i] = charset[RandomInt(len(charset))]
+		buf[i] = charset[RandomInt(0, len(charset))]
 	}
 
 	return string(buf)

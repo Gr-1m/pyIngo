@@ -58,6 +58,7 @@ func Post(url, proxy string, headers map[string]string, body io.Reader, verify b
 
 func (c *Client) Post(endpoint string, headers map[string]string, body io.Reader) (resp *http.Response, err error) {
 	req, err := http.NewRequest("POST", endpoint, body)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	if err != nil {
 		return nil, err
 	}
@@ -76,6 +77,5 @@ func (c *Client) Post(endpoint string, headers map[string]string, body io.Reader
 		c.Timeout = time.Second * 3
 	}
 
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	return c.Do(req)
 }
