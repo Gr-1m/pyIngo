@@ -8,7 +8,7 @@ then
 fi
 unset user
 
-ln -s $(pwd) "$(go env GOROOT)/src/goInpy";
+ln -s $(pwd) "$(go env GOROOT)/src/pyIngo";
 
 if [ $? -eq 0 ]
 then

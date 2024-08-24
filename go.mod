@@ -1,3 +1,3 @@
-module goInpy
+module pyIngo
 
-go 1.22
+go 1.22.6
