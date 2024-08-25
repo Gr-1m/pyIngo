@@ -34,6 +34,8 @@ func (bt *Bruter) goWork(args ...interface{}) {
 	}
 }
 
+// todo: The data inflow here still needs to be optimized
+// todo: 
 func (bt *Bruter) Start(bs []interface{}, args ...interface{}) {
 	bt.taskNum = len(bs)
 
@@ -66,15 +68,17 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) {
 }
 
 // Recommended Example Template
-func (bt *Bruter) singleTask(b interface{}, args ...interface{}) (err error) {
+// singleTask
+func singleTask(b interface{}, args ...interface{}) (err error) {
 
 	var (
-		ok       bool // Recommended Var
+		ok       bool 
 		yourVar1 string
 		yourVar2 int
 	)
 
-	// your SingleTask want args length
+	// If your function needs to control the number of variables
+	// If you want to check the type of a variable
 	if len(args) != 2 {
 		err = errors.New("args number is wrong")
 	} else {
@@ -93,7 +97,7 @@ func (bt *Bruter) singleTask(b interface{}, args ...interface{}) (err error) {
 		}
 	}
 
-	// your SingleTask funcLogic
+	// Implement your function logic here
 	_ = yourVar1
 	_ = yourVar2
 
@@ -105,4 +109,31 @@ func (bt *Bruter) singleTask(b interface{}, args ...interface{}) (err error) {
 
 // Recommended Example Template
 // Recommended CoreLogic
-func ExampleScan() {}
+func exampleScan(thread int, arg0,arg1 string) []int {
+	var (
+		bt      *Bruter
+		data    []interface{}
+		results []int
+	)
+
+	data = make([]interface{}, 65535)
+
+	for i := 0; i < 65535; i++ {
+		data[i] = i + 1
+	}
+
+	bt.SingleTask = singleTask // function pointer
+	bt.Threads = thread
+
+	bt.Start(data, arg0,arg1)
+
+	for _, rd := range bt.ResultData {
+		v, ok := rd.(int)
+		if ok {
+			results = append(results, v)
+		}
+	}
+	// sort.Ints(results)
+
+	return results
+}
