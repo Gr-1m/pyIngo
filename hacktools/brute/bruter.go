@@ -64,6 +64,7 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) error{
 			bt.dataIn <- b
 			time.Sleep(time.Microsecond*time.Duration(200))
 		}
+		pgbar.Clear()
 	}()
 
 	for ; bt.taskNum > 0; bt.taskNum-- {
@@ -115,6 +116,7 @@ func (bt *Bruter) StartWithFile(file *os.File, args ...interface{}) error{
 
 			time.Sleep(time.Microsecond*time.Duration(200))
 		}
+		pgbar.Clear()
 	}()
 
 	for ; bt.taskNum > 0; bt.taskNum-- {

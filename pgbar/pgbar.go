@@ -28,6 +28,8 @@ func loading(ms int) {
 
 func vlen(v interface{}) int {
 	switch vt := v.(type) {
+	case int:
+		return vt
 	case string:
 		return len(vt)
 	case []interface{}:
@@ -50,36 +52,6 @@ func NewBar(v interface{}) (interface{}, *Bar) {
 	b.setRate(0)
 
 	return v, b
-}
-
-func InitDBar(v interface{}) interface{} {
-	// Initialize Default Bar
-
-	DefaultBar.graph = "#"
-	DefaultBar.total = vlen(v)
-	DefaultBar.current = 0
-	DefaultBar.setRate(0)
-
-	return v
-}
-
-func DPlay(cur int) {
-	go DefaultBar.Play(cur)
-}
-
-func Play(cur int, v interface{}) {
-	// If you have performance requirements, please perform InitDBar before the loop
-	// If you don't mind, you can use this garbage function for progress bar rendering
-	//
-	// (The author hasn't yes figured out how to optimize it, If you hava any good suggestions, please pull request, Thanks very much)
-	//
-
-	InitDBar(v)
-	go DefaultBar.Play(cur)
-
-	if DefaultBar.percent == 100 {
-		fmt.Printf("\r\x1b[01;40;36m[%-100s]100%% \x1b[0m%8d/%d\x1b[K\n", DefaultBar.rate, DefaultBar.total, DefaultBar.total)
-	}
 }
 
 func (b *Bar) getPercent() uint8 {
@@ -110,4 +82,38 @@ func (b *Bar) Play(cur int) {
 
 	fmt.Printf("\r\x1b[01;40;36m>[%c][%-100s]%3d%% \x1b[0m%8d/%d\x1b[K", jdt[int(b.percent)%len(jdt)], b.rate, b.percent, b.current, b.total)
 
+}
+
+func InitDBar(v interface{}) interface{} {
+	// Initialize Default Bar
+
+	DefaultBar.graph = "#"
+	DefaultBar.total = vlen(v)
+	DefaultBar.current = 0
+	DefaultBar.setRate(0)
+
+	return v
+}
+
+func DPlay(cur int) {
+	go DefaultBar.Play(cur)
+}
+
+func Play(cur int, v interface{}) {
+	// If you have performance requirements, please perform InitDBar before the loop
+	// If you don't mind, you can use this garbage function for progress bar rendering
+	//
+	// (The author hasn't yes figured out how to optimize it, If you have any good suggestions, please pull request, Thanks very much)
+	//
+
+	InitDBar(v)
+	go DefaultBar.Play(cur)
+
+	if DefaultBar.percent == 100 {
+		fmt.Printf("\r\x1b[01;40;36m[%-100s]100%% \x1b[0m%8d/%d\x1b[K\n", DefaultBar.rate, DefaultBar.total, DefaultBar.total)
+	}
+}
+
+func Clear(){
+	fmt.Println("\r\x1b[0m\x1b[K")
 }
