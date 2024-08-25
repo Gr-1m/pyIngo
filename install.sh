@@ -6,6 +6,8 @@ then
 	exit 1
 fi
 
+rm -f "$(go env GOROOT)/src/goInpy"
+rm -f "$(go env GOROOT)/src/pyIngo"
 ln -s $(pwd) "$(go env GOROOT)/src/pyIngo";
 
 if [ $? -eq 0 ]
