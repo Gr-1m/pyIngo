@@ -5,6 +5,8 @@ import (
 	"errors"
 	"io"
 	"os"
+	"pyIngo/pgbar"
+	"time"
 )
 
 type Worker interface {
@@ -56,8 +58,11 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) error{
 	}
 
 	go func() {
-		for _, b := range bs {
+		pgbar.InitDBar(bt.taskNum)
+		for pg, b := range bs {
+			pgbar.DPlay(pg)
 			bt.dataIn <- b
+			time.Sleep(time.Microsecond*time.Duration(200))
 		}
 	}()
 
@@ -98,10 +103,17 @@ func (bt *Bruter) StartWithFile(file *os.File, args ...interface{}) error{
 	}
 
 	go func() {
+		pgbar.InitDBar(bt.taskNum)
+		linenum = 0 
+
 		file.Seek(0, io.SeekStart)
 		fileScanner = bufio.NewScanner(file)
 		for fileScanner.Scan() {
+			pgbar.DPlay(linenum)
 			bt.dataIn <- fileScanner.Text()
+			linenum++
+
+			time.Sleep(time.Microsecond*time.Duration(200))
 		}
 	}()
 
