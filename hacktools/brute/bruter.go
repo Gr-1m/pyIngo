@@ -1,7 +1,10 @@
 package brute
 
 import (
+	"bufio"
 	"errors"
+	"io"
+	"os"
 )
 
 type Worker interface {
@@ -35,7 +38,7 @@ func (bt *Bruter) goWork(args ...interface{}) {
 }
 
 // todo: The data inflow here still needs to be optimized
-// todo: 
+// todo:
 func (bt *Bruter) Start(bs []interface{}, args ...interface{}) {
 	bt.taskNum = len(bs)
 
@@ -67,12 +70,52 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) {
 	return
 }
 
+func (bt *Bruter) StartWithFile(file *os.File, args ...interface{}) {
+
+	bt.dataIn = make(chan interface{}, bt.Threads)
+	bt.result = make(chan interface{})
+
+	defer close(bt.dataIn)
+	defer close(bt.result)
+	defer file.Close()
+
+	for i := 1; i < cap(bt.dataIn); i++ {
+		go bt.goWork(args...)
+	}
+
+	var linenum int
+	var fileScanner = bufio.NewScanner(file)
+	for fileScanner.Scan() {
+		linenum++
+	}
+	bt.taskNum = linenum
+
+	go func() {
+		file.Seek(0, io.SeekStart)
+		fileScanner = bufio.NewScanner(file)
+		for fileScanner.Scan() {
+			bt.dataIn <- fileScanner.Text()
+		}
+	}()
+
+	for ; bt.taskNum > 0; bt.taskNum-- {
+		r := <-bt.result
+		if err, ok := r.(error); ok {
+			bt.ErrData = append(bt.ErrData, err)
+		} else {
+			bt.ResultData = append(bt.ResultData, r)
+		}
+	}
+
+	return
+}
+
 // Recommended Example Template
 // singleTask
 func singleTask(b interface{}, args ...interface{}) (err error) {
 
 	var (
-		ok       bool 
+		ok       bool
 		yourVar1 string
 		yourVar2 int
 	)
@@ -109,7 +152,7 @@ func singleTask(b interface{}, args ...interface{}) (err error) {
 
 // Recommended Example Template
 // Recommended CoreLogic
-func exampleScan(thread int, arg0,arg1 string) []int {
+func exampleScan(thread int, arg0, arg1 string) []int {
 	var (
 		bt      *Bruter
 		data    []interface{}
@@ -125,7 +168,7 @@ func exampleScan(thread int, arg0,arg1 string) []int {
 	bt.SingleTask = singleTask // function pointer
 	bt.Threads = thread
 
-	bt.Start(data, arg0,arg1)
+	bt.Start(data, arg0, arg1)
 
 	for _, rd := range bt.ResultData {
 		v, ok := rd.(int)
