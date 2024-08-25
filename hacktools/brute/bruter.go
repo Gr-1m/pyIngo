@@ -79,6 +79,44 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) error{
 	return nil
 }
 
+func (bt *Bruter) StartWithInt(numRange [2]int, args ...interface{}) error{
+	bt.taskNum = numRange[1] - numRange[0]
+
+	bt.dataIn = make(chan interface{}, bt.Threads)
+	bt.result = make(chan interface{})
+
+	defer close(bt.dataIn)
+	defer close(bt.result)
+
+	if bt.Threads >= bt.taskNum{
+		return errors.New("Thread > taskNum Error!")
+	}
+	for i := 1; i < cap(bt.dataIn); i++ {
+		go bt.goWork(args...)
+	}
+
+	go func() {
+		pgbar.InitDBar(bt.taskNum)
+		for pg := numRange[0]; pg < numRange[1]; pg++ {
+			pgbar.DPlay(pg - numRange[0])
+			bt.dataIn <- pg
+			time.Sleep(time.Microsecond*time.Duration(200))
+		}
+		pgbar.Clear()
+	}()
+
+	for ; bt.taskNum > 0; bt.taskNum-- {
+		r := <-bt.result
+		if err, ok := r.(error); ok {
+			bt.ErrData = append(bt.ErrData, err)
+		} else {
+			bt.ResultData = append(bt.ResultData, r)
+		}
+	}
+
+	return nil
+}
+
 func (bt *Bruter) StartWithFile(file *os.File, args ...interface{}) error{
 
 	bt.dataIn = make(chan interface{}, bt.Threads)

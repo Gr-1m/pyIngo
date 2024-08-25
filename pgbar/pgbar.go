@@ -77,10 +77,10 @@ func (b *Bar) setRate(incret int) {
 func (b *Bar) Play(cur int) {
 	var jdt = "-\\|/"
 
-	b.current = cur
+	b.current = cur + 1
 	b.setRate(int(b.getPercent() - b.percent))
 
-	fmt.Printf("\r\x1b[01;40;36m>[%c][%-100s]%3d%% \x1b[0m%8d/%d\x1b[K", jdt[int(b.percent)%len(jdt)], b.rate, b.percent, b.current, b.total)
+	fmt.Printf("\r\x1b[01;40;36m>[%c][%-100s]%3d%% \x1b[0m%8d/%d\x1b[K\r", jdt[int(b.percent)%len(jdt)], b.rate, b.percent, b.current, b.total)
 
 }
 
@@ -97,6 +97,10 @@ func InitDBar(v interface{}) interface{} {
 
 func DPlay(cur int) {
 	go DefaultBar.Play(cur)
+
+	if DefaultBar.percent == 100 {
+		fmt.Printf("\r\x1b[01;40;36m[%-100s]100%% \x1b[0m%8d/%d\x1b[K\n", DefaultBar.rate, DefaultBar.total, DefaultBar.total)
+	}
 }
 
 func Play(cur int, v interface{}) {
