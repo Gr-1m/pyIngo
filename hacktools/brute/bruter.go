@@ -50,7 +50,7 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) {
 	}
 
 	go func() {
-		for b := range bs {
+		for _, b := range bs {
 			bt.dataIn <- b
 		}
 	}()
@@ -113,7 +113,7 @@ func exampleScan(thread int, arg0,arg1 string) []int {
 	var (
 		bt      *Bruter
 		data    []interface{}
-		results []int
+		results []int // whatever type you want, same as func return
 	)
 
 	data = make([]interface{}, 65535)
