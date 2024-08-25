@@ -39,7 +39,7 @@ func (bt *Bruter) goWork(args ...interface{}) {
 
 // todo: The data inflow here still needs to be optimized
 // todo:
-func (bt *Bruter) Start(bs []interface{}, args ...interface{}) {
+func (bt *Bruter) Start(bs []interface{}, args ...interface{}) error{
 	bt.taskNum = len(bs)
 
 	bt.dataIn = make(chan interface{}, bt.Threads)
@@ -48,6 +48,9 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) {
 	defer close(bt.dataIn)
 	defer close(bt.result)
 
+	if bt.Threads >= bt.taskNum{
+		return errors.New("Thread > taskNum Error!")
+	}
 	for i := 1; i < cap(bt.dataIn); i++ {
 		go bt.goWork(args...)
 	}
@@ -67,10 +70,10 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) {
 		}
 	}
 
-	return
+	return nil
 }
 
-func (bt *Bruter) StartWithFile(file *os.File, args ...interface{}) {
+func (bt *Bruter) StartWithFile(file *os.File, args ...interface{}) error{
 
 	bt.dataIn = make(chan interface{}, bt.Threads)
 	bt.result = make(chan interface{})
@@ -90,6 +93,10 @@ func (bt *Bruter) StartWithFile(file *os.File, args ...interface{}) {
 	}
 	bt.taskNum = linenum
 
+	if bt.Threads >= bt.taskNum{
+		return errors.New("Thread > taskNum Error!")
+	}
+
 	go func() {
 		file.Seek(0, io.SeekStart)
 		fileScanner = bufio.NewScanner(file)
@@ -107,7 +114,7 @@ func (bt *Bruter) StartWithFile(file *os.File, args ...interface{}) {
 		}
 	}
 
-	return
+	return nil
 }
 
 // Recommended Example Template
