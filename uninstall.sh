@@ -6,9 +6,8 @@ then
 	exit 1
 fi
 
-rm -f "$(go env GOROOT)/src/goInpy"
 rm -f "$(go env GOROOT)/src/pyIngo"
-rm -rf $(pwd)
+rm -rf ./ 
 
 if [ $? -eq 0 ]
 then

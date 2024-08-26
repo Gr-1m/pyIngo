@@ -11,6 +11,8 @@ type Bar struct {
 	total   int
 	rate    string
 	graph   string
+
+	// pgchan chan int
 }
 
 var DefaultBar Bar
@@ -74,14 +76,17 @@ func (b *Bar) setRate(incret int) {
 
 }
 
-func (b *Bar) Play(cur int) {
+func (b *Bar) Play(cur chan int) {
 	var jdt = "-\\|/"
 
-	b.current = cur + 1
-	b.setRate(int(b.getPercent() - b.percent))
+	for b.current = range cur {
+		b.setRate(int(b.getPercent() - b.percent))
 
-	fmt.Printf("\r\x1b[01;40;36m>[%c][%-100s]%3d%% \x1b[0m%8d/%d\x1b[K\r", jdt[int(b.percent)%len(jdt)], b.rate, b.percent, b.current, b.total)
+		fmt.Printf("\r\x1b[01;40;36m>[%c][%-100s]%3d%% \x1b[0m%8d/%d\x1b[K\r", jdt[b.current%len(jdt)], b.rate, b.percent, b.current, b.total)
+		// fmt.Printf("\r\x1b[01;40;36m>[][%-100s]%3d%% \x1b[0m%8d/%d\x1b[K\r", b.rate, b.percent, b.current, b.total)
+	}
 
+	// fmt.Printf("\r\x1b[01;40;36m[%-100s]100%% \x1b[0m%8d/%d\x1b[K\n", DefaultBar.rate, DefaultBar.total, DefaultBar.total)
 }
 
 func InitDBar(v interface{}) interface{} {
@@ -95,29 +100,18 @@ func InitDBar(v interface{}) interface{} {
 	return v
 }
 
-func DPlay(cur int) {
+func DPlay(cur chan int) {
 	go DefaultBar.Play(cur)
-
-	if DefaultBar.percent == 100 {
-		fmt.Printf("\r\x1b[01;40;36m[%-100s]100%% \x1b[0m%8d/%d\x1b[K\n", DefaultBar.rate, DefaultBar.total, DefaultBar.total)
-	}
 }
 
-func Play(cur int, v interface{}) {
-	// If you have performance requirements, please perform InitDBar before the loop
-	// If you don't mind, you can use this garbage function for progress bar rendering
+func Play(cur chan int, v interface{}) {
 	//
-	// (The author hasn't yes figured out how to optimize it, If you have any good suggestions, please pull request, Thanks very much)
-	//
+	// With Channel Optimization, there is no longer a need for prior InitBar first to improve performance
 
 	InitDBar(v)
 	go DefaultBar.Play(cur)
-
-	if DefaultBar.percent == 100 {
-		fmt.Printf("\r\x1b[01;40;36m[%-100s]100%% \x1b[0m%8d/%d\x1b[K\n", DefaultBar.rate, DefaultBar.total, DefaultBar.total)
-	}
 }
 
-func Clear(){
-	fmt.Println("\r\x1b[0m\x1b[K")
+func Clear() {
+	fmt.Println("\n\x1b[0m\r\x1b[K")
 }
