@@ -69,6 +69,7 @@ func (bt *IntBruter) goWork(args ...interface{}) {
 	for b := range bt.dataIn {
 		if err := bt.SingleTask(b, args...); err != nil {
 			bt.result <- 0
+			bt.ErrData = append(bt.ErrData, err)
 		} else {
 			bt.result <- b
 			continue
@@ -81,6 +82,7 @@ func (bt *StringBruter) goWork(args ...interface{}) {
 	for b := range bt.dataIn {
 		if err := bt.SingleTask(b, args...); err != nil {
 			bt.result <- ""
+			bt.ErrData = append(bt.ErrData, err)
 		} else {
 			bt.result <- b
 			continue
@@ -153,11 +155,17 @@ func (bt *IntBruter) StartWithInt(numRange [2]int, args ...interface{}) error {
 		defer close(pgchan)
 
 		pgbar.Play(pgchan, bt.taskNum)
-		for pg := numRange[0]; pg < numRange[1]; pg++ {
-			pgchan <- (pg - numRange[0] + 1)
-			bt.dataIn <- pg
+		// go 1.22
+		for pg := range numRange[1] - numRange[0] {
+			pgchan <- pg + 1
+			bt.dataIn <- numRange[0] + pg
 		}
-		// pgbar.Clear()
+		// go < 1.22
+		/*
+			for pg := numRange[0]; pg < numRange[1]; pg++ {
+				pgchan <- (pg - numRange[0] + 1)
+				bt.dataIn <- pg
+			}*/
 	}(numRange)
 
 	for ; bt.taskNum > 0; bt.taskNum-- {
@@ -193,20 +201,22 @@ func (bt *StringBruter) StartWithFile(file *os.File, args ...interface{}) error 
 	if err := fileScanner.Err(); err != nil {
 		panic(err)
 	}
-	bt.taskNum = linenum
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		panic(err)
+	}
 
+	bt.taskNum = linenum
 	if bt.Threads > bt.taskNum {
 		return errors.New("Threads > taskNum Error!")
 	}
 
-	go func() {
+	go func(file *os.File) {
 		var pgchan = make(chan int)
 		defer close(pgchan)
 
 		pgbar.Play(pgchan, bt.taskNum)
 		linenum = 0
 
-		file.Seek(0, io.SeekStart)
 		fileScanner = bufio.NewScanner(file)
 		for fileScanner.Scan() {
 			pgchan <- (linenum + 1)
@@ -216,8 +226,7 @@ func (bt *StringBruter) StartWithFile(file *os.File, args ...interface{}) error 
 		if err := fileScanner.Err(); err != nil {
 			panic(err)
 		}
-		// pgbar.Clear()
-	}()
+	}(file)
 
 	for ; bt.taskNum > 0; bt.taskNum-- {
 		r := <-bt.result
