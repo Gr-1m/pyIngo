@@ -42,31 +42,26 @@ func RandomChoice(population interface{}) (interface{}, error) {
 	}
 }
 
-func RandomChoices(population interface{}, repeat int) ([]interface{}, error) {
-	var (
-		ln  int
-		buf = make([]interface{}, repeat)
-		// Returning local variables here is unsafe and requires optimization
-	)
+func RandomChoices(population interface{}, repeat int) (cr []interface{}, err error) {
+
 	switch vt := population.(type) {
 	case string:
-		ln = len(vt)
-		for i := range buf {
-			buf[i] = string(vt[RandomInt(0, ln)])
+		for _ = range repeat {
+			cr = append(cr, string(vt[RandomInt(0, len(vt))]))
 		}
 	case []interface{}:
-		ln = len(vt)
-		for i := range buf {
-			buf[i] = vt[RandomInt(0, ln)]
+		for _ = range repeat {
+			cr = append(cr, vt[RandomInt(0, len(vt))])
 		}
 	default:
-		return nil, errors.New("Unsupported Type")
+		err = errors.ErrUnsupported
+		cr = nil
 	}
 
-	return buf, nil
+	return
 }
 
-func GenRandomString(length int, charset string) string {
+func GenRandomString(length int, charset string) (rs string) {
 	if length == 0 {
 		length = 5
 	}
@@ -82,6 +77,6 @@ func GenRandomString(length int, charset string) string {
 		buf[i] = charset[RandomInt(0, len(charset))]
 	}
 
-	return string(buf)
-
+	rs = string(buf)
+	return
 }
