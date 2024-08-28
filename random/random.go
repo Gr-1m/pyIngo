@@ -46,6 +46,7 @@ func RandomChoices(population interface{}, repeat int) ([]interface{}, error) {
 	var (
 		ln  int
 		buf = make([]interface{}, repeat)
+		// Returning local variables here is unsafe and requires optimization
 	)
 	switch vt := population.(type) {
 	case string:

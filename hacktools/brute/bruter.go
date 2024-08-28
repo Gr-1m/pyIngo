@@ -24,7 +24,6 @@ type Bruter struct {
 
 	ResultData []interface{}
 	ErrData    []error
-	// timeout int
 }
 
 type IntBruter struct {
@@ -108,7 +107,7 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) error {
 		go bt.goWork(args...)
 	}
 
-	go func() {
+	go func(bs []interface{}) {
 		var pgchan = make(chan int)
 		defer close(pgchan)
 
@@ -118,7 +117,7 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) error {
 			bt.dataIn <- b
 		}
 		// pgbar.Clear()
-	}()
+	}(bs)
 
 	for ; bt.taskNum > 0; bt.taskNum-- {
 		r := <-bt.result
@@ -149,7 +148,7 @@ func (bt *IntBruter) StartWithInt(numRange [2]int, args ...interface{}) error {
 		go bt.goWork(args...)
 	}
 
-	go func() {
+	go func(numRange [2]int) {
 		var pgchan = make(chan int)
 		defer close(pgchan)
 
@@ -159,7 +158,7 @@ func (bt *IntBruter) StartWithInt(numRange [2]int, args ...interface{}) error {
 			bt.dataIn <- pg
 		}
 		// pgbar.Clear()
-	}()
+	}(numRange)
 
 	for ; bt.taskNum > 0; bt.taskNum-- {
 		r := <-bt.result
@@ -191,6 +190,9 @@ func (bt *StringBruter) StartWithFile(file *os.File, args ...interface{}) error 
 	for fileScanner.Scan() {
 		linenum++
 	}
+	if err := fileScanner.Err(); err != nil {
+		panic(err)
+	}
 	bt.taskNum = linenum
 
 	if bt.Threads > bt.taskNum {
@@ -210,6 +212,9 @@ func (bt *StringBruter) StartWithFile(file *os.File, args ...interface{}) error 
 			pgchan <- (linenum + 1)
 			bt.dataIn <- fileScanner.Text()
 			linenum++
+		}
+		if err := fileScanner.Err(); err != nil {
+			panic(err)
 		}
 		// pgbar.Clear()
 	}()
