@@ -83,10 +83,7 @@ func (b *Bar) Play(cur chan int) {
 		b.setRate(int(b.getPercent() - b.percent))
 
 		fmt.Printf("\r\x1b[01;40;36m>[%c][%-100s]%3d%% \x1b[0m%8d/%d\x1b[K\r", jdt[b.current%len(jdt)], b.rate, b.percent, b.current, b.total)
-		// fmt.Printf("\r\x1b[01;40;36m>[][%-100s]%3d%% \x1b[0m%8d/%d\x1b[K\r", b.rate, b.percent, b.current, b.total)
 	}
-
-	// fmt.Printf("\r\x1b[01;40;36m[%-100s]100%% \x1b[0m%8d/%d\x1b[K\n", DefaultBar.rate, DefaultBar.total, DefaultBar.total)
 }
 
 func InitDBar(v interface{}) interface{} {

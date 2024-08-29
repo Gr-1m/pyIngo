@@ -8,7 +8,7 @@ fi
 
 rm -f "$(go env GOROOT)/src/goInpy"
 rm -f "$(go env GOROOT)/src/pyIngo"
-rm -rf ./ 
+# rm -rf ./ 
 
 if [ $? -eq 0 ]
 then
