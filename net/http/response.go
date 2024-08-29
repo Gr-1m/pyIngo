@@ -50,3 +50,5 @@ func (rb *RespBody) Close() error {
 
 	return nil
 }
+
+// Use io.Copy(*RespBody, http.Response.Body)
