@@ -13,6 +13,8 @@ type Worker interface {
 	goWork(datain, result chan interface{}, args ...interface{})
 }
 
+// type SingleTask func(b interface{}, args ...interface{}) error
+
 type Bruter struct {
 	SingleTask func(b interface{}, args ...interface{}) error
 
@@ -232,7 +234,7 @@ func (bt *StringBruter) StartWithFile(file *os.File, args ...interface{}) error 
 
 // Recommended Example Template
 // singleTask
-func singleTask(b interface{}, args ...interface{}) (err error) {
+func singleTask(b int, args ...interface{}) (err error) {
 
 	var (
 		ok       bool
@@ -242,19 +244,23 @@ func singleTask(b interface{}, args ...interface{}) (err error) {
 
 	// If your function needs to control the number of variables
 	// If you want to check the type of a variable
+
+	// You should check you argsList type in this function
 	if len(args) != 2 {
 		err = errors.New("args number is wrong")
 	} else {
 		yourVar1, ok = args[0].(string)
 		if !ok {
 			err = errors.New("args0 type is wrong")
+			return
 		}
 		yourVar2, ok = args[1].(int)
 		if !ok {
 			err = errors.New("args1 type is wrong")
+			return
 		}
 
-		_, ok = b.(int)
+		// _, ok = b.(int)
 		if !ok {
 			err = errors.New("The Data type is Wrong which from chan interface{}")
 		}
@@ -263,6 +269,7 @@ func singleTask(b interface{}, args ...interface{}) (err error) {
 	// Implement your function logic here
 	_ = yourVar1
 	_ = yourVar2
+	// YourFunc(b, yourVar1,yourVar2)
 
 	return
 }
@@ -274,29 +281,18 @@ func singleTask(b interface{}, args ...interface{}) (err error) {
 // Recommended CoreLogic
 func exampleScan(thread int, arg0, arg1 string) []int {
 	var (
-		bt      *Bruter
-		data    []interface{}
+		bt      *IntBruter
 		results []int // whatever type you want
 	)
-
-	data = make([]interface{}, 65535)
-
-	for i := 0; i < 65535; i++ {
-		data[i] = i + 1
-	}
 
 	bt.SingleTask = singleTask // function pointer
 	bt.Threads = thread
 
-	bt.Start(data, arg0, arg1)
+	bt.StartWithInt([2]int{1, 65536}, arg0, arg1)
 
 	for _, rd := range bt.ResultData {
-		v, ok := rd.(int)
-		if ok {
-			results = append(results, v)
-		}
+		results = append(results, rd)
 	}
-	// sort.Ints(results)
 
 	return results
 }

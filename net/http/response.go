@@ -5,9 +5,7 @@ import (
 	"net/http"
 )
 
-type Response struct {
-	http.Response
-}
+type Response = http.Response
 
 type RespBody struct {
 	BodyLen  int64
@@ -50,5 +48,3 @@ func (rb *RespBody) Close() error {
 
 	return nil
 }
-
-// Use io.Copy(*RespBody, http.Response.Body)

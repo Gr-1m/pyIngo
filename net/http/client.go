@@ -32,7 +32,7 @@ func Get(url, proxy string, headers map[string]string, verify bool) (*Response, 
 	return DefaultClient.Get(url, headers)
 }
 
-func (c *Client) Get(endpoint string, headers map[string]string) (resp *Response, err error) {
+func (c *Client) Get(endpoint string, headers map[string]string) (*Response, error) {
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return nil, err
@@ -53,9 +53,7 @@ func (c *Client) Get(endpoint string, headers map[string]string) (resp *Response
 		}
 	}
 
-	creq, err := c.Do(req)
-	resp = &Response{*creq}
-	return
+	return c.Do(req)
 
 }
 
@@ -72,7 +70,7 @@ func Post(url, proxy string, headers map[string]string, body io.Reader, verify b
 	return DefaultClient.Post(url, headers, body)
 }
 
-func (c *Client) Post(endpoint string, headers map[string]string, body io.Reader) (resp *Response, err error) {
+func (c *Client) Post(endpoint string, headers map[string]string, body io.Reader) (*Response, error) {
 	req, err := http.NewRequest("POST", endpoint, body)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	if err != nil {
@@ -96,7 +94,5 @@ func (c *Client) Post(endpoint string, headers map[string]string, body io.Reader
 		c.Timeout = time.Second * 3
 	}
 
-	creq, err := c.Do(req)
-	resp = &Response{*creq}
-	return
+	return c.Do(req)
 }
