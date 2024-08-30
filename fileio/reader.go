@@ -1,13 +1,12 @@
-package readerwrite
+package fileio
 
 import (
-	"bufio"
+	// "bufio"
+	"bytes"
 	"errors"
 	"io"
 	"os"
 )
-
-const DefaultOnceByte = 1024
 
 func FileRead(filename string, once uint) ([]byte, error) {
 	// TODO: Determine if the exists
@@ -41,6 +40,11 @@ func FileRead(filename string, once uint) ([]byte, error) {
 func FileReadN(filename string) ([][]byte, error) {
 	// TODO: Determine if the exists
 
+	s, err := os.Stat(filename)
+	if err != nil || s.IsDir() {
+		return nil, errors.New("File not Found or IsDir")
+	}
+
 	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)
@@ -70,46 +74,10 @@ func FileReadOnce(file *os.File, oncebyte uint) ([]byte, error) {
 	if err != nil && err != io.EOF {
 		return nil, err
 	}
-
 	if n == 0 {
 		return nil, nil
 	}
+	buf = bytes.TrimRight(buf, "\x00")
 
 	return buf, nil
-}
-
-func FileWriteN(filename string, buf []byte) (uint, error) {
-	// TODO: Determine if the exists
-
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-
-	var n uint
-	for i := 0; i < len(buf); i += DefaultOnceByte {
-
-		o, err := FileWriteOnce(file, buf[i:i+DefaultOnceByte])
-		if err != nil {
-			panic(err)
-		}
-		n += o
-
-	}
-
-	return n, nil
-
-}
-
-func FileWriteOnce(file *os.File, oncebuf []byte) (uint, error) {
-
-	r := bufio.NewWriter(file)
-
-	n, err := r.Write(oncebuf)
-	if err != nil && n != len(oncebuf) {
-		return 0, err
-	}
-	r.Flush()
-
-	return uint(n), nil
 }
