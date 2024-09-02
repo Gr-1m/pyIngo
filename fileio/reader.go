@@ -1,8 +1,6 @@
 package fileio
 
 import (
-	// "bufio"
-	"bytes"
 	"errors"
 	"io"
 	"os"
@@ -22,19 +20,15 @@ func FileRead(filename string, once uint) ([]byte, error) {
 
 	buf := make([]byte, once)
 	if once == 0 {
-		buf, err = FileReadOnce(file, DefaultOnceByte)
-		if err != nil {
-			return nil, err
-		}
-
-	} else {
-		buf, err = FileReadOnce(file, once)
-		if err != nil {
-			return nil, err
-		}
+		once = DefaultOnceByte
 	}
-	return buf, nil
 
+	buf, err = ReadOnce(file, once)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf, nil
 }
 
 func FileReadN(filename string) ([][]byte, error) {
@@ -52,7 +46,7 @@ func FileReadN(filename string) ([][]byte, error) {
 
 	r := make([][]byte, 0)
 	for {
-		buf, err := FileReadOnce(file, DefaultOnceByte)
+		buf, err := ReadOnce(file, DefaultOnceByte)
 		if err != nil {
 			panic(err)
 		}
@@ -64,9 +58,7 @@ func FileReadN(filename string) ([][]byte, error) {
 
 }
 
-func FileReadOnce(file *os.File, oncebyte uint) ([]byte, error) {
-
-	// r := bufio.NewReader(file)
+func ReadOnce(file *os.File, oncebyte uint) ([]byte, error) {
 
 	buf := make([]byte, oncebyte)
 
@@ -77,7 +69,5 @@ func FileReadOnce(file *os.File, oncebyte uint) ([]byte, error) {
 	if n == 0 {
 		return nil, nil
 	}
-	buf = bytes.TrimRight(buf, "\x00")
-
-	return buf, nil
+	return buf[:n], nil
 }
