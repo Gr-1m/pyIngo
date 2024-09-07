@@ -79,7 +79,12 @@ func (b *Bar) setRate(incret int) {
 func (b *Bar) Play(cur chan int) {
 	var jdt = "-\\|/"
 
-	for b.current = range cur {
+	for c := range cur {
+		if c < b.current {
+			break
+		} else {
+			b.current = c
+		}
 		b.setRate(int(b.getPercent() - b.percent))
 
 		fmt.Printf("\r\x1b[01;40;36m>[%c][%-100s]%3d%% \x1b[0m%8d/%d\x1b[K\r", jdt[b.current%len(jdt)], b.rate, b.percent, b.current, b.total)

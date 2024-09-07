@@ -29,6 +29,7 @@ func FileRead(filename string, once uint) ([]byte, error) {
 	}
 
 	return buf, nil
+
 }
 
 func FileReadN(filename string) ([][]byte, error) {

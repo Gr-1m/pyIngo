@@ -105,7 +105,8 @@ func (bt *Bruter) Start(bs []interface{}, args ...interface{}) error {
 		return errors.New("Threads > taskNum Error!")
 	}
 
-	for i := 1; i < cap(bt.dataIn); i++ {
+	// for i := 1; i < cap(bt.dataIn); i++ {
+	for range cap(bt.dataIn) {
 		go bt.goWork(args...)
 	}
 
@@ -146,7 +147,8 @@ func (bt *IntBruter) StartWithInt(numRange [2]int, args ...interface{}) error {
 		return errors.New("Threads > taskNum Error!")
 	}
 
-	for i := 1; i < cap(bt.dataIn); i++ {
+	// for i := 1; i < cap(bt.dataIn); i++ {
+	for range cap(bt.dataIn) {
 		go bt.goWork(args...)
 	}
 
@@ -189,7 +191,8 @@ func (bt *StringBruter) StartWithFile(file *os.File, args ...interface{}) error 
 	defer close(bt.result)
 	defer file.Close()
 
-	for i := 1; i < cap(bt.dataIn); i++ {
+	// for i := 1; i < cap(bt.dataIn); i++ {
+	for range cap(bt.dataIn) {
 		go bt.goWork(args...)
 	}
 

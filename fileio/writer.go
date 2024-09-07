@@ -9,7 +9,7 @@ func FileWriteN(filename string, buf []byte) (uint, error) {
 	// TODO: Determine if the exists
 	s, err := os.Stat(filename)
 	if err != nil || s.IsDir() {
-		return nil, errors.New("File not Found or IsDir")
+		return 0, errors.New("File not Found or IsDir")
 	}
 
 	file, err := os.Open(filename)
@@ -21,12 +21,12 @@ func FileWriteN(filename string, buf []byte) (uint, error) {
 	for i := 0; i < len(buf); i += DefaultOnceByte {
 
 		if len(buf) < DefaultOnceByte {
-			o, _ := FileWriteOnce(file, buf[i:i+DefaultOnceByte])
+			o, _ := WriteOnce(file, buf[:DefaultOnceByte])
 			n += o
 			break
 		}
 
-		o, err := FileWriteOnce(file, buf[:DefaultOnceByte])
+		o, err := WriteOnce(file, buf[:DefaultOnceByte])
 		if err != nil {
 			panic(err)
 		}
