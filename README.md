@@ -3,6 +3,9 @@
 
 > This is a Golang library that allows you to use Python-like syntax in your Golang code.
 > It provides a set of data types and built-in functions commonly found in Python, …
+>
+> It is also a structure that is frequently used, saving the need to repeatedly build wheels in subsequent work
+
 
 ## Install:
 
