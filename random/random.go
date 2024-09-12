@@ -24,7 +24,15 @@ func GetRandBit(bitNum int) int {
 	return seed.Intn((1 << bitNum) - 1)
 }
 
-// func RandByte(bNum int) []byte {}
+func RandByte(bNum int) []byte {
+	b := make([]byte, bNum, bNum)
+	_, err := rand.Read(b)
+	if err != nil {
+		return nil
+	}
+
+	return b
+}
 
 func RandomChoice(population interface{}) (interface{}, error) {
 
