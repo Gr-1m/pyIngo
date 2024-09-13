@@ -1,12 +1,17 @@
 package random
 
 import (
+	// crand "crypto/rand"
 	"errors"
 	"math/rand"
 	"time"
 )
 
 var seed *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+func GetRandBit(bitNum int) int {
+	return seed.Intn((1 << bitNum) - 1)
+}
 
 func RandomInt(minNum, maxNum int) (s int) {
 	if minNum == 0 {
@@ -20,18 +25,13 @@ func RandomInt(minNum, maxNum int) (s int) {
 
 }
 
-func GetRandBit(bitNum int) int {
-	return seed.Intn((1 << bitNum) - 1)
-}
-
-func RandByte(bNum int) []byte {
-	b := make([]byte, bNum, bNum)
+func RandByte(bNum int) (b []byte) {
+	b = make([]byte, bNum, bNum)
 	_, err := rand.Read(b)
 	if err != nil {
 		return nil
 	}
-
-	return b
+	return
 }
 
 func RandomChoice(population interface{}) (interface{}, error) {

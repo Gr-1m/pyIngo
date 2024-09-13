@@ -28,5 +28,4 @@ func (m MapSlice) Less(i, j int) bool {
 // Swap swaps the elements with indexes i and j.
 func (m MapSlice) Swap(i, j int) {
 	m[i], m[j] = m[j], m[i]
-	return
 }

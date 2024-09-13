@@ -28,6 +28,18 @@ type Bruter struct {
 	ErrData    []error
 }
 
+func (bt *Bruter) goWork(args ...interface{}) {
+
+	for b := range bt.dataIn {
+		if err := bt.SingleTask(b, args...); err != nil {
+			bt.result <- err
+		} else {
+			bt.result <- b
+			continue
+		}
+	}
+}
+
 type IntBruter struct {
 	SingleTask func(b int, args ...interface{}) error
 
@@ -41,6 +53,18 @@ type IntBruter struct {
 	ErrData    []error
 }
 
+func (bt *IntBruter) goWork(args ...interface{}) {
+
+	for b := range bt.dataIn {
+		if err := bt.SingleTask(b, args...); err != nil {
+			bt.result <- 0
+		} else {
+			bt.result <- b
+			continue
+		}
+	}
+}
+
 type StringBruter struct {
 	SingleTask func(b string, args ...interface{}) error
 
@@ -52,30 +76,6 @@ type StringBruter struct {
 
 	ResultData []string
 	ErrData    []error
-}
-
-func (bt *Bruter) goWork(args ...interface{}) {
-
-	for b := range bt.dataIn {
-		if err := bt.SingleTask(b, args...); err != nil {
-			bt.result <- err
-		} else {
-			bt.result <- b
-			continue
-		}
-	}
-}
-
-func (bt *IntBruter) goWork(args ...interface{}) {
-
-	for b := range bt.dataIn {
-		if err := bt.SingleTask(b, args...); err != nil {
-			bt.result <- 0
-		} else {
-			bt.result <- b
-			continue
-		}
-	}
 }
 
 func (bt *StringBruter) goWork(args ...interface{}) {
@@ -235,6 +235,11 @@ func (bt *StringBruter) StartWithFile(file *os.File, args ...interface{}) error 
 	return nil
 }
 
+/*
+---------------****************---------------
+******** The Follow Function and Variable e.g. is just an Example
+
+********/
 // Recommended Example Template
 // singleTask
 func singleTask(b int, args ...interface{}) (err error) {
