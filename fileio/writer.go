@@ -32,7 +32,6 @@ func FileWriteN(filename string, buf []byte) (uint, error) {
 		}
 		buf = buf[DefaultOnceByte:]
 		n += o
-
 	}
 
 	return n, nil
@@ -45,7 +44,6 @@ func WriteOnce(file *os.File, oncebuf []byte) (uint, error) {
 	if err != nil && n != len(oncebuf) {
 		return 0, err
 	}
-	file.Sync()
 
-	return uint(n), nil
+	return uint(n), file.Sync()
 }
